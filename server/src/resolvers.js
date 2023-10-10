@@ -1,5 +1,26 @@
 import { faker } from '@faker-js/faker';
 
+/**
+ * Format seconds to human readable text in a compact form:
+ * s, m or H:m (not m:s or H:m:s)
+ */
+const humanReadableTimeFromSeconds = (seconds) => {
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+  const totalMinutes = Math.floor(seconds / 60);
+  let hours = Math.floor(totalMinutes / 60) || 0;
+  const minutestoDisplay = totalMinutes % 60;
+  let timeStr = ``;
+  if (hours > 0) {
+    timeStr += `${hours}h `;
+  }
+  timeStr += `${minutestoDisplay}m`;
+
+  return timeStr;
+};
+
+
 const resolvers = {
   Query: {
     // returns an array of Tracks that will be used to populate the homepage grid of our web client
@@ -26,7 +47,12 @@ const resolvers = {
       return dataSources.trackAPI.getTrackModules(id);
     },
 
+    duration: ({ length }) => humanReadableTimeFromSeconds(length),
+
     reviewScore: () => faker.number.float({min: 1, max: 10, precision: 0.1})
+  },
+  Module: {
+    duration: ({ length }) => humanReadableTimeFromSeconds(length)
   }
 };
 
